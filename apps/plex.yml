@@ -231,6 +231,8 @@
           PLEX_UID: '1000'
           PLEX_GID: '1000'
           ADVERTISE_IP: '{{customConnections}}'
+          NVIDIA_VISIBLE_DEVICES: 'all'
+          NVIDIA_DRIVER_CAPABILITIES: 'compute,video,utility'
         networks:
           - name: plexguide
             aliases:
@@ -242,6 +244,18 @@
         restart_policy: unless-stopped
         state: started
         labels: '{{default_labels}}'
+        device_requests:
+      - # Add some specific devices to this container
+          device_ids:
+            - '0'
+            - 'GPU-3a23c669-1f69-c64e-cf85-44e9b07e7a2a'
+      - # Add nVidia GPUs to this container
+        driver: nvidia
+        count: -1  # this means we want all
+        capabilities:
+            - compute
+            - utility
+            - video
       when: servertype.stdout == "local"
 
     ###################### Plex WebTools
